@@ -3,7 +3,7 @@
 import { useChat } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
 
 import ChatBottombar from '@/components/chat/chat-footer';
@@ -43,9 +43,8 @@ const Chat = () => {
     },
   });
 
-  // Auto-submit query from URL param once
+  // In your Chat component, keep this effect for initial query:
   useEffect(() => {
-    // Only auto-submit if there are no messages (i.e., on fresh load)
     if (initialQuery && !autoSubmitted && messages.length === 0) {
       setAutoSubmitted(true);
       setInput('');
@@ -80,12 +79,57 @@ const Chat = () => {
   // Check if chat is empty (no messages and not loading)
   const isEmptyState = messages.length === 0 && !isLoading;
 
+  // State for animated AI typing
+  const [animatedTexts, setAnimatedTexts] = useState<Record<number, string>>(
+    {}
+  );
+  const typingIntervals = useRef<Record<number, NodeJS.Timeout>>({});
+
+  useEffect(() => {
+    // Whenever a new assistant message appears, animate its text
+    messages.forEach((msg, i) => {
+      if (
+        msg.role === 'assistant' &&
+        typeof msg.content === 'string' &&
+        !animatedTexts[i]
+      ) {
+        let idx = 0;
+        const fullText = msg.content;
+        const typingSpeed = 22; // ms per char, adjust for slower/faster
+
+        // Clear any existing interval for this message
+        if (typingIntervals.current[i]) {
+          clearInterval(typingIntervals.current[i]);
+        }
+
+        setAnimatedTexts((prev) => ({ ...prev, [i]: '' }));
+
+        typingIntervals.current[i] = setInterval(() => {
+          idx++;
+          setAnimatedTexts((prev) => ({
+            ...prev,
+            [i]: fullText.slice(0, idx),
+          }));
+
+          if (idx >= fullText.length) {
+            clearInterval(typingIntervals.current[i]);
+            delete typingIntervals.current[i];
+          }
+        }, typingSpeed);
+      }
+    });
+
+    // Cleanup intervals on unmount
+    return () => {
+      Object.values(typingIntervals.current).forEach(clearInterval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
+
   return (
     <div className="container mx-auto flex h-screen max-w-3xl flex-col">
       {/* Chat content */}
       <div className="flex-1 overflow-y-auto px-2 pt-8">
-        {' '}
-        {/* pt-8 adds space from top */}
         <AnimatePresence mode="wait">
           {isEmptyState ? (
             <motion.div
@@ -106,9 +150,17 @@ const Chat = () => {
                     {...MOTION_CONFIG}
                     className="pb-4"
                   >
+                    {/* AI message with animated typing */}
                     <SimplifiedChatView
-                      message={msg}
-                      isLoading={isLoading}
+                      message={{
+                        ...msg,
+                        // Use animated text if available, else fallback
+                        content:
+                          animatedTexts[i] !== undefined
+                            ? animatedTexts[i]
+                            : msg.content,
+                      }}
+                      isLoading={false} // Do not show loading on AI answer
                       reload={reload}
                       addToolResult={addToolResult}
                     />
@@ -127,17 +179,6 @@ const Chat = () => {
                     </div>
                   </motion.div>
                 ) : null
-              )}
-              {isLoading && (
-                <motion.div
-                  key="loading"
-                  {...MOTION_CONFIG}
-                  className="px-4 pt-18"
-                >
-                  <div className="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100 w-full animate-pulse rounded px-4 py-2">
-                    Loading...
-                  </div>
-                </motion.div>
               )}
             </>
           )}

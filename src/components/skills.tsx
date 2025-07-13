@@ -50,7 +50,6 @@ export default function Skills() {
               </span>
             ))}
           </div>
-          {/* ChatGPT-like answer prompt box */}
           <div className="mt-4 w-full"></div>
         </div>
       </div>

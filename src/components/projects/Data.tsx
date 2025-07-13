@@ -163,7 +163,7 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
 
   return (
     // ADDED: Force dark background and theme for the card
-    <div className="space-y-10 rounded-3xl bg-[#18181b] p-4 text-neutral-100 shadow-xl md:p-8">
+    <div className="space-y-10 rounded-3xl p-4 text-neutral-100 md:p-8 dark:bg-[#232326]">
       {/* Header section with description */}
       <div className="rounded-3xl bg-[#232326] p-8 dark:bg-[#232326]">
         <div className="space-y-6">

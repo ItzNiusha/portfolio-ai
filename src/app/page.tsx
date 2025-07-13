@@ -136,9 +136,7 @@ export default function Home() {
                 <button
                   key={key}
                   type="button"
-                  onClick={() =>
-                    goToChat(questions[key as keyof typeof questions] || '')
-                  }
+                  onClick={() => goToChat(questions[key])} // assuming goToChat navigates with query param
                   className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-base font-medium text-[var(--foreground)] shadow-sm ring-1 ring-white/20 transition-all duration-150 hover:bg-white hover:text-black hover:ring-black/10 focus:outline-none active:scale-95"
                   aria-label={key}
                   style={{
