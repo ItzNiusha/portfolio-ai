@@ -1,0 +1,168 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ChatGPT-like Very Dark Mode Color Variables, now even more grey (#252629) */
+:root {
+  --radius: 0.625rem;
+  --background: #252629; /* Even more grey */
+  --foreground: #ececf1;
+  --card: #252629;
+  --card-foreground: #ececf1;
+  --popover: #252629;
+  --popover-foreground: #ececf1;
+  --primary: #10a37f;
+  --primary-foreground: #252629;
+  --secondary: #2e2f34;
+  --secondary-foreground: #ececf1;
+  --muted: #36383a;
+  --muted-foreground: #a9a9bc;
+  --accent: #565869;
+  --accent-foreground: #ececf1;
+  --destructive: #ef4444;
+  --border: #36383a;
+  --input: #36383a;
+  --ring: #10a37f;
+  --chart-1: #fae69e;
+  --chart-2: #7bdff2;
+  --chart-3: #b2f7ef;
+  --chart-4: #fffcb9;
+  --chart-5: #fff2a6;
+  --sidebar: #202123;
+  --sidebar-foreground: #ececf1;
+  --sidebar-primary: #10a37f;
+  --sidebar-primary-foreground: #252629;
+  --sidebar-accent: #36383a;
+  --sidebar-accent-foreground: #ececf1;
+  --sidebar-border: #36383a;
+  --sidebar-ring: #10a37f;
+}
+
+.dark {
+  --background: #252629;
+  --foreground: #ececf1;
+  --card: #252629;
+  --card-foreground: #ececf1;
+  --popover: #252629;
+  --popover-foreground: #ececf1;
+  --primary: #10a37f;
+  --primary-foreground: #252629;
+  --secondary: #2e2f34;
+  --secondary-foreground: #ececf1;
+  --muted: #36383a;
+  --muted-foreground: #a9a9bc;
+  --accent: #565869;
+  --accent-foreground: #ececf1;
+  --destructive: #ef4444;
+  --border: #36383a;
+  --input: #36383a;
+  --ring: #10a37f;
+  --chart-1: #fae69e;
+  --chart-2: #7bdff2;
+  --chart-3: #b2f7ef;
+  --chart-4: #fffcb9;
+  --chart-5: #fff2a6;
+  --sidebar: #202123;
+  --sidebar-foreground: #ececf1;
+  --sidebar-primary: #10a37f;
+  --sidebar-primary-foreground: #252629;
+  --sidebar-accent: #36383a;
+  --sidebar-accent-foreground: #ececf1;
+  --sidebar-border: #36383a;
+  --sidebar-ring: #10a37f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'Geist Sans', 'Segoe UI', Arial, sans-serif;
+  }
+}
+
+/* Custom scrollbar styling for ChatGPT very dark mode */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #36383a #252629;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #252629;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #36383a;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #565869;
+}
+
+pre,
+code {
+  background: #2e2f34 !important;
+  color: #ececf1 !important;
+  border-radius: 0.4em;
+}
+
+pre {
+  white-space: pre;
+  word-wrap: normal;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+code {
+  padding: 0.2em 0.4em;
+  font-family: var(--font-mono, 'Fira Mono', 'Menlo', monospace);
+  font-size: 0.97em;
+}
