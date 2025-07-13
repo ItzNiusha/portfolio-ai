@@ -3,16 +3,12 @@
 import { useChat } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import ChatBottombar from '@/components/chat/chat-footer';
 import ChatLanding from '@/components/chat/chat-landing';
 import { SimplifiedChatView } from '@/components/chat/simple-chat-view';
-import {
-  ChatBubble,
-  ChatBubbleMessage,
-} from '@/components/ui/chat/chat-bubble';
 
 const MOTION_CONFIG = {
   initial: { opacity: 0, y: 20 },
@@ -49,12 +45,13 @@ const Chat = () => {
 
   // Auto-submit query from URL param once
   useEffect(() => {
-    if (initialQuery && !autoSubmitted) {
+    // Only auto-submit if there are no messages (i.e., on fresh load)
+    if (initialQuery && !autoSubmitted && messages.length === 0) {
       setAutoSubmitted(true);
       setInput('');
       append({ role: 'user', content: initialQuery.trim() });
     }
-  }, [initialQuery, autoSubmitted, setInput, append]);
+  }, [initialQuery, autoSubmitted, setInput, append, messages.length]);
 
   // Tool progress state
   const isToolInProgress = messages.some(
@@ -86,7 +83,9 @@ const Chat = () => {
   return (
     <div className="container mx-auto flex h-screen max-w-3xl flex-col">
       {/* Chat content */}
-      <div className="flex-1 overflow-y-auto px-2">
+      <div className="flex-1 overflow-y-auto px-2 pt-8">
+        {' '}
+        {/* pt-8 adds space from top */}
         <AnimatePresence mode="wait">
           {isEmptyState ? (
             <motion.div
@@ -118,11 +117,14 @@ const Chat = () => {
                   <motion.div
                     key={msg.id || i}
                     {...MOTION_CONFIG}
-                    className="pb-4"
+                    className="flex justify-end pb-4"
                   >
-                    <ChatBubble variant="sent">
-                      <ChatBubbleMessage>{msg.content}</ChatBubbleMessage>
-                    </ChatBubble>
+                    <div
+                      className="w-fit max-w-[80%] rounded-lg border border-gray-200 bg-white px-4 py-2 text-black shadow"
+                      style={{ wordBreak: 'break-word' }}
+                    >
+                      {msg.content}
+                    </div>
                   </motion.div>
                 ) : null
               )}
@@ -132,9 +134,9 @@ const Chat = () => {
                   {...MOTION_CONFIG}
                   className="px-4 pt-18"
                 >
-                  <ChatBubble variant="received">
-                    <ChatBubbleMessage isLoading />
-                  </ChatBubble>
+                  <div className="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100 w-full animate-pulse rounded px-4 py-2">
+                    Loading...
+                  </div>
                 </motion.div>
               )}
             </>

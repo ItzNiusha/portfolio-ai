@@ -81,6 +81,7 @@ export default function ChatBottombar({
       return;
     }
     if (question) {
+      // Navigate to chat with query param, append is handled in chat.tsx useEffect
       router.push(`/chat?query=${encodeURIComponent(question)}`);
     }
   };

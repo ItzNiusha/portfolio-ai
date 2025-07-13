@@ -1,9 +1,5 @@
 'use client';
 
-import {
-  ChatBubble,
-  ChatBubbleMessage,
-} from '@/components/ui/chat/chat-bubble';
 import { ChatRequestOptions } from 'ai';
 import { Message } from 'ai/react';
 import { motion } from 'framer-motion';
@@ -75,18 +71,14 @@ export function SimplifiedChatView({
         {/* Text content */}
         {hasTextContent && (
           <div className="w-full">
-            <ChatBubble variant="received" className="w-full">
-              <ChatBubbleMessage className="w-full">
-                <ChatMessageContent
-                  message={message}
-                  isLast={true}
-                  isLoading={isLoading}
-                  reload={reload}
-                  addToolResult={addToolResult}
-                  skipToolRendering={true}
-                />
-              </ChatBubbleMessage>
-            </ChatBubble>
+            <ChatMessageContent
+              message={message}
+              isLast={true}
+              isLoading={isLoading}
+              reload={reload}
+              addToolResult={addToolResult}
+              skipToolRendering={true}
+            />
           </div>
         )}
 
