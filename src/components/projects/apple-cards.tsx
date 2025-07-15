@@ -95,7 +95,9 @@ export const Carousel = ({
   const isMobile = () => window && window.innerWidth < 768;
 
   return (
-    <CarouselContext.Provider value={{ onCardClose: handleCardClose, currentIndex }}>
+    <CarouselContext.Provider
+      value={{ onCardClose: handleCardClose, currentIndex }}
+    >
       <div className="relative w-full">
         <div
           className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth py-10 [scrollbar-width:none]"
@@ -104,7 +106,7 @@ export const Carousel = ({
         >
           <div className="absolute right-0 z-[10] h-auto w-[5%] overflow-hidden bg-gradient-to-l" />
 
-          <div className="flex flex-row justify-start gap-4 mx-auto max-w-7xl">
+          <div className="mx-auto flex max-w-7xl flex-row justify-start gap-4">
             {items.map((item, index) => (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -161,6 +163,12 @@ export const Card = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const { onCardClose, currentIndex } = useContext(CarouselContext);
 
+  // --- FIX: Move handleClose above its usage ---
+  const handleClose = () => {
+    setOpen(false);
+    onCardClose(index);
+  };
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') handleClose();
@@ -170,16 +178,12 @@ export const Card = ({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open]);
+  }, [open]); // handleClose does not need to be in deps as it's stable
 
   // @ts-ignore
   useOutsideClick(containerRef, handleClose);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
-    onCardClose(index);
-  };
 
   return (
     <>
