@@ -10,7 +10,7 @@ const profile = {
   name: 'Niusha Nessa Shahrivar',
   age: '25',
   location: 'Stockholm, Sweden',
-  src: '/profile-niush.png',
+  src: '/profile-niush.PNG',
   tags: ['Developer', 'Tech Girl', 'Stockholm', 'Challenge', 'Coding'],
   resume: '/niushasresume.pdf',
 };
