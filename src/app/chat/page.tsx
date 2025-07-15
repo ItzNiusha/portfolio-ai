@@ -1,17 +1,10 @@
-'use client';
-
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Chat from '@/components/chat/chat';
 
-export default function Page() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('query') || '';
-  const topic = searchParams.get('topic') || '';
-  // Use both topic and query for the key!
+export default function ChatPage() {
   return (
-    <Suspense fallback={<div>Loading the chat...</div>}>
-      <Chat key={`${topic}--${query}`} />
+    <Suspense fallback={<div className="p-4 text-center">Loading chat...</div>}>
+      <Chat />
     </Suspense>
   );
 }

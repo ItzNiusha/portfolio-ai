@@ -6,6 +6,7 @@ import { ArrowUp, Home } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import QuickQuestionButtons from './QuickQuestionButtons';
+import type { Variants, Transition } from 'framer-motion';
 
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -21,12 +22,16 @@ interface ChatBottombarProps {
   quickQuestionDisabled?: boolean;
 }
 
-const bottomVariants = {
+const bottomVariants: Variants = {
   hidden: { opacity: 0, y: 80 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: 'ease', duration: 0.8, delay: 0.2 },
+    transition: {
+      type: 'tween' as Transition['type'], // 👈 this cast fixes the error
+      duration: 0.8,
+      delay: 0.2,
+    },
   },
 };
 

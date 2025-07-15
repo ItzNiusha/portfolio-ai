@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
+import type { Variants, Transition } from 'framer-motion';
+
 
 const profile = {
   name: 'Niusha Nessa Shahrivar',
@@ -13,14 +15,21 @@ const profile = {
   resume: '/niushasresume.pdf',
 };
 
-const fadeInUp = {
+
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 32 },
-  visible: (delay = 0) => ({
+  visible: (custom: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.56, ease: 'easeOut', delay },
+    transition: {
+      duration: 0.56,
+      ease: 'easeOut',
+      delay: custom,
+      type: 'tween' as Transition['type'], // cast type
+    },
   }),
 };
+
 
 export function Presentation() {
   return (

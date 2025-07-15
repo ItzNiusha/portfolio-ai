@@ -1,4 +1,5 @@
 'use client';
+
 import { useOutsideClick } from '@/use/use-outside-click';
 import { cn } from '@/utils';
 import {
@@ -38,9 +39,9 @@ export const Carousel = ({
   items: React.ReactNode[];
   initialScroll?: number;
 }) => {
-  const carouselRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(true);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -58,40 +59,30 @@ export const Carousel = ({
     }
   };
 
-  // Get the card width and gap based on viewport size
   const getScrollDistance = () => {
-    // Card width (w-56 = 224px) + gap-4 (16px)
     const cardWidth = 224;
     const gap = 16;
-    const totalWidth = cardWidth + gap;
-
-    // Scroll by 2 cards on desktop, 1 on mobile
-    const cardsToScroll = 1;
-    return totalWidth * cardsToScroll;
+    return (cardWidth + gap) * 1;
   };
 
   const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: -getScrollDistance(),
-        behavior: 'smooth',
-      });
-    }
+    carouselRef.current?.scrollBy({
+      left: -getScrollDistance(),
+      behavior: 'smooth',
+    });
   };
 
   const scrollRight = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: getScrollDistance(),
-        behavior: 'smooth',
-      });
-    }
+    carouselRef.current?.scrollBy({
+      left: getScrollDistance(),
+      behavior: 'smooth',
+    });
   };
 
   const handleCardClose = (index: number) => {
     if (carouselRef.current) {
-      const cardWidth = 224; // w-56 (224px)
-      const gap = isMobile() ? 16 : 16; // gap-4 (16px)
+      const cardWidth = 224;
+      const gap = 16;
       const scrollPosition = (cardWidth + gap) * index;
       carouselRef.current.scrollTo({
         left: scrollPosition,
@@ -101,48 +92,32 @@ export const Carousel = ({
     }
   };
 
-  const isMobile = () => {
-    return window && window.innerWidth < 768;
-  };
+  const isMobile = () => window && window.innerWidth < 768;
 
   return (
-    <CarouselContext.Provider
-      value={{ onCardClose: handleCardClose, currentIndex }}
-    >
+    <CarouselContext.Provider value={{ onCardClose: handleCardClose, currentIndex }}>
       <div className="relative w-full">
         <div
           className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth py-10 [scrollbar-width:none]"
           ref={carouselRef}
           onScroll={checkScrollability}
         >
-          <div
-            className={cn(
-              'absolute right-0 z-[10] h-auto w-[5%] overflow-hidden bg-gradient-to-l'
-            )}
-          ></div>
+          <div className="absolute right-0 z-[10] h-auto w-[5%] overflow-hidden bg-gradient-to-l" />
 
-          <div
-            className={cn(
-              'flex flex-row justify-start gap-4',
-              'mx-auto max-w-7xl' // remove max-w-4xl if you want the carousel to span the full width of its container
-            )}
-          >
+          <div className="flex flex-row justify-start gap-4 mx-auto max-w-7xl">
             {items.map((item, index) => (
               <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{
                   opacity: 1,
                   y: 0,
                   transition: {
                     duration: 0.5,
                     delay: 0.2 * index,
-                    ease: 'easeOut',
-                    once: true,
+                    ease: 'easeOut' as const,
                   },
                 }}
+                viewport={{ once: true }}
                 key={'card' + index}
                 className="rounded-3xl last:pr-[5%] md:last:pr-[33%]"
               >
@@ -151,6 +126,7 @@ export const Carousel = ({
             ))}
           </div>
         </div>
+
         <div className="mr-10 flex justify-end gap-2 md:mr-20">
           <button
             className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
@@ -187,28 +163,19 @@ export const Card = ({
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        handleClose();
-      }
+      if (event.key === 'Escape') handleClose();
     }
 
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    document.body.style.overflow = open ? 'hidden' : 'auto';
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
-  //@ts-ignore
-  useOutsideClick(containerRef, () => handleClose());
+  // @ts-ignore
+  useOutsideClick(containerRef, handleClose);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
+  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     onCardClose(index);
@@ -233,7 +200,6 @@ export const Card = ({
               layoutId={layout ? `card-${card.title}` : undefined}
               className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-neutral-900 font-sans text-white"
             >
-              {/* Sticky close button */}
               <div className="sticky top-4 z-52 flex justify-end px-8 pt-8 md:px-14 md:pt-8">
                 <button
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-black/90 shadow-md dark:bg-white/90"
@@ -243,7 +209,6 @@ export const Card = ({
                 </button>
               </div>
 
-              {/* Header section with consistent padding */}
               <div className="relative px-8 pt-2 pb-0 md:px-14">
                 <div>
                   <motion.p
@@ -261,19 +226,18 @@ export const Card = ({
                 </div>
               </div>
 
-              {/* Content with consistent padding */}
               <div className="px-8 pt-8 pb-14 md:px-14">{card.content}</div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
         className="relative z-10 flex h-80 w-56 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900"
       >
         <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black via-transparent to-transparent hover:scale-110" />
-        {/*<div className="absolute inset-0 z-20 cursor-pointer bg-black/20 hover:bg-black/2" />*/}
         <div className="relative z-40 p-8">
           <motion.p
             layoutId={layout ? `category-${card.category}` : undefined}

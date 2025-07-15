@@ -4,20 +4,34 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
+import type { Variants, Transition } from 'framer-motion';
 
 import FluidCursor from '@/components/fluid-cursor';
 import QuickQuestionButtons from '@/components/chat/QuickQuestionButtons';
 
 const topVariants = {
   hidden: { opacity: 0, y: -60 },
-  visible: { opacity: 1, y: 0, transition: { type: 'ease', duration: 0.8 } },
-};
-const bottomVariants = {
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'tween',
+      duration: 0.8,
+      ease: 'easeOut',
+    },
+  },
+} as Variants;
+
+const bottomVariants: Variants = {
   hidden: { opacity: 0, y: 80 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: 'ease', duration: 0.8, delay: 0.2 },
+    transition: {
+      type: 'tween' as Transition['type'], // 👈 this cast fixes the error
+      duration: 0.8,
+      delay: 0.2,
+    },
   },
 };
 

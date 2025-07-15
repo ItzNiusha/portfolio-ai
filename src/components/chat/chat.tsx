@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import type { Easing } from 'framer-motion';
 
 import ChatBottombar from '@/components/chat/chat-footer';
 import ChatLanding from '@/components/chat/chat-landing';
@@ -14,7 +15,10 @@ const MOTION_CONFIG = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 20 },
-  transition: { duration: 0.3, ease: 'easeOut' },
+  transition: {
+    duration: 0.3,
+    ease: 'easeOut' as Easing,
+  },
 };
 
 const Chat = () => {

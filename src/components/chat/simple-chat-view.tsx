@@ -5,6 +5,7 @@ import { Message } from 'ai/react';
 import { motion } from 'framer-motion';
 import ChatMessageContent from './chat-message-content';
 import ToolRenderer from './tool-renderer';
+import type { Easing } from 'framer-motion';
 
 interface SimplifiedChatViewProps {
   message: Message;
@@ -21,7 +22,7 @@ const MOTION_CONFIG = {
   exit: { opacity: 0, y: 20 },
   transition: {
     duration: 0.3,
-    ease: 'easeOut',
+    ease: 'easeOut' as Easing,
   },
 };
 
