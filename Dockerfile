@@ -10,12 +10,16 @@ COPY . .
 
 RUN npm run build && npm run export
 
+
 FROM nginx:alpine
+
 
 RUN rm -rf /usr/share/nginx/html/*
 
-Copy exported static files
+
 COPY --from=builder /app/out /usr/share/nginx/html
+
+
 
 EXPOSE 80
 
