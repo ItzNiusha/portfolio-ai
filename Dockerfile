@@ -9,8 +9,6 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 RUN npm run build 
-RUN npm run export
-
 
 FROM nginx:alpine
 
