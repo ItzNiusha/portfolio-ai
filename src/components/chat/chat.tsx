@@ -21,6 +21,8 @@ const Chat = () => {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('query');
 
+  // Use a ref for strict, synchronous "has submitted" guard (avoiding StrictMode double effect problem)
+  const autoSubmittedRef = useRef(false);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
 
   const {
@@ -43,14 +45,22 @@ const Chat = () => {
     },
   });
 
-  // In your Chat component, keep this effect for initial query:
+  // Only append initial query ONCE, and only if there are no messages (guarded by ref)
   useEffect(() => {
-    if (initialQuery && !autoSubmitted && messages.length === 0) {
-      setAutoSubmitted(true);
+    if (initialQuery && !autoSubmittedRef.current && messages.length === 0) {
+      autoSubmittedRef.current = true; // Synchronously block further runs
+      setAutoSubmitted(true); // For UI, if you need it
       setInput('');
+      console.log('[LOG] useEffect: Appending initialQuery', initialQuery);
       append({ role: 'user', content: initialQuery.trim() });
+    } else {
+      console.log('[LOG] useEffect: Did NOT append', {
+        initialQuery,
+        autoSubmitted: autoSubmittedRef.current,
+        messagesLength: messages.length,
+      });
     }
-  }, [initialQuery, autoSubmitted, setInput, append, messages.length]);
+  }, [initialQuery, setInput, append, messages.length]);
 
   // Tool progress state
   const isToolInProgress = messages.some(
@@ -66,7 +76,8 @@ const Chat = () => {
   // Form submit handler
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isToolInProgress) return;
+    if (!input.trim() || isToolInProgress || isLoading) return;
+    console.log('[LOG] onSubmit: Appending input', input.trim());
     append({ role: 'user', content: input.trim() });
     setInput('');
   };
@@ -86,7 +97,7 @@ const Chat = () => {
   const typingIntervals = useRef<Record<number, NodeJS.Timeout>>({});
 
   useEffect(() => {
-    // Whenever a new assistant message appears, animate its text
+    // Animate text only for new assistant messages
     messages.forEach((msg, i) => {
       if (
         msg.role === 'assistant' &&
@@ -95,7 +106,7 @@ const Chat = () => {
       ) {
         let idx = 0;
         const fullText = msg.content;
-        const typingSpeed = 22; // ms per char, adjust for slower/faster
+        const typingSpeed = 22; // ms per char
 
         // Clear any existing interval for this message
         if (typingIntervals.current[i]) {
@@ -119,12 +130,30 @@ const Chat = () => {
       }
     });
 
-    // Cleanup intervals on unmount
     return () => {
       Object.values(typingIntervals.current).forEach(clearInterval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
+  // Track when a quick question is in progress
+  const [quickQuestionInProgress, setQuickQuestionInProgress] = useState(false);
+
+  // Handler for quick question buttons (only on /chat)
+  const onQuickQuestion = (question: string) => {
+    if (isLoading || isToolInProgress || quickQuestionInProgress) return;
+    setQuickQuestionInProgress(true);
+    console.log('[LOG] onQuickQuestion: Appending quick question', question);
+    append({ role: 'user', content: question });
+    setInput('');
+  };
+
+  // Re-enable quick question buttons when AI finishes responding
+  useEffect(() => {
+    if (!isLoading && !isToolInProgress && quickQuestionInProgress) {
+      setQuickQuestionInProgress(false);
+    }
+  }, [isLoading, isToolInProgress, quickQuestionInProgress]);
 
   return (
     <div className="container mx-auto flex h-screen max-w-3xl flex-col">
@@ -138,7 +167,10 @@ const Chat = () => {
               {...MOTION_CONFIG}
             >
               <ChatLanding
-                submitQuery={(q) => append({ role: 'user', content: q })}
+                submitQuery={(q) => {
+                  console.log('[LOG] ChatLanding: Appending landing query', q);
+                  append({ role: 'user', content: q });
+                }}
               />
             </motion.div>
           ) : (
@@ -150,17 +182,15 @@ const Chat = () => {
                     {...MOTION_CONFIG}
                     className="pb-4"
                   >
-                    {/* AI message with animated typing */}
                     <SimplifiedChatView
                       message={{
                         ...msg,
-                        // Use animated text if available, else fallback
                         content:
                           animatedTexts[i] !== undefined
                             ? animatedTexts[i]
                             : msg.content,
                       }}
-                      isLoading={false} // Do not show loading on AI answer
+                      isLoading={false}
                       reload={reload}
                       addToolResult={addToolResult}
                     />
@@ -180,7 +210,6 @@ const Chat = () => {
                   </motion.div>
                 ) : null
               )}
-              {/* Removed Loading... for AI answers */}
             </>
           )}
         </AnimatePresence>
@@ -195,6 +224,10 @@ const Chat = () => {
           isLoading={isLoading}
           stop={handleStop}
           isToolInProgress={isToolInProgress}
+          onQuickQuestion={onQuickQuestion}
+          quickQuestionDisabled={
+            quickQuestionInProgress || isLoading || isToolInProgress
+          }
         />
       </div>
     </div>

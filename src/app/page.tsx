@@ -6,21 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 
 import FluidCursor from '@/components/fluid-cursor';
-
-const questions = {
-  Me: 'Tell me about yourself.',
-  Projects: 'What projects are you working on?',
-  Skills: 'What are your key strengths?',
-  Fun: 'What’s the most adventurous thing you’ve done?',
-  Contact: 'How can I reach you?',
-} as const;
-
-const questionConfig = [
-  { key: 'Me', emoji: '🤠' },
-  { key: 'Projects', emoji: '👩🏼‍💻' },
-  { key: 'Skills', emoji: '🤓' },
-  { key: 'Contact', emoji: '📧' },
-] as const;
+import QuickQuestionButtons from '@/components/chat/QuickQuestionButtons';
 
 const topVariants = {
   hidden: { opacity: 0, y: -60 },
@@ -129,32 +115,7 @@ export default function Home() {
                 <ArrowUp className="h-5 w-5" />
               </button>
             </div>
-            <div className="mt-2 flex flex-wrap justify-start gap-2 pt-2">
-              {questionConfig.map(({ key, emoji }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => goToChat(questions[key])} // assuming goToChat navigates with query param
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-base font-medium text-[var(--foreground)] shadow-sm ring-1 ring-white/20 transition-all duration-150 hover:bg-white hover:text-black hover:ring-black/10 focus:outline-none active:scale-95"
-                  aria-label={key}
-                  style={{
-                    minWidth: 80, // smaller width
-                    fontWeight: 500,
-                    fontSize: '0.85rem', // smaller text
-                    letterSpacing: 0.1,
-                    borderRadius: '9999px',
-                    paddingLeft: 12,
-                    paddingRight: 12,
-                    paddingTop: 5,
-                    paddingBottom: 5,
-                    backdropFilter: 'blur(2px)',
-                  }}
-                >
-                  <span className="text-lg">{emoji}</span>
-                  <span className="tracking-tight">{key}</span>
-                </button>
-              ))}
-            </div>
+            <QuickQuestionButtons onClick={goToChat} disabled={false} />
           </div>
         </form>
       </motion.div>

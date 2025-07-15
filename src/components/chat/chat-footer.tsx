@@ -2,25 +2,10 @@
 
 import { ChatRequestOptions } from 'ai';
 import { motion } from 'framer-motion';
-import { ArrowUp } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-const questions = {
-  Me: 'Tell me about yourself.',
-  Projects: 'What projects are you working on?',
-  Skills: 'What are your key strengths?',
-  Fun: 'What’s the most adventurous thing you’ve done?',
-  Contact: 'How can I reach you?',
-} as const;
-
-const questionConfig = [
-  { key: 'Me', emoji: '🤠' },
-  { key: 'Projects', emoji: '👩🏼‍💻' },
-  { key: 'Skills', emoji: '🤓' },
-  { key: 'Contact', emoji: '📧' },
-  { key: 'Home', emoji: '🤖' },
-] as const;
+import { ArrowUp, Home } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import QuickQuestionButtons from './QuickQuestionButtons';
 
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -33,6 +18,7 @@ interface ChatBottombarProps {
   input: string;
   isToolInProgress: boolean;
   onQuickQuestion?: (question: string) => void;
+  quickQuestionDisabled?: boolean;
 }
 
 const bottomVariants = {
@@ -76,22 +62,17 @@ export default function ChatBottombar({
   stop,
   isToolInProgress,
   onQuickQuestion,
+  quickQuestionDisabled = false,
 }: ChatBottombarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const [quickQuestionDisabled, setQuickQuestionDisabled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, [inputRef]);
-
-  useEffect(() => {
-    if (!isLoading && !isToolInProgress) {
-      setQuickQuestionDisabled(false);
-    }
-  }, [isLoading, isToolInProgress]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (
@@ -105,40 +86,18 @@ export default function ChatBottombar({
     }
   };
 
-  // Debounced navigation to avoid rapid multiple triggers
   const debouncedHandleQuickQuestion = useDebouncedCallback(
     (question: string, key?: string) => {
-      // Console log for diagnostics
-      console.log('[QuickQuestion] Click detected', {
-        question,
-        key,
-        quickQuestionDisabled,
-        isLoading,
-        isToolInProgress,
-        url: `/chat?query=${encodeURIComponent(question)}`,
-      });
-
-      // Detect duplicate nav or rapid firing
-      if (quickQuestionDisabled || isLoading || isToolInProgress) {
-        console.log(
-          '[QuickQuestion] Blocked due to disabled/loading/tool in progress.'
-        );
-        return;
-      }
-      setQuickQuestionDisabled(true);
-
-      if (key === 'Home') {
-        router.push('/');
-        console.log('[QuickQuestion] Navigating Home');
-        return;
-      }
-      if (question) {
-        router.push(`/chat?query=${encodeURIComponent(question)}`);
-        console.log('[QuickQuestion] Navigating to chat with query:', question);
-      }
+      if (quickQuestionDisabled || isLoading || isToolInProgress) return;
+      router.push(`/chat?query=${encodeURIComponent(question)}&topic=${key}`);
     },
-    600 // 600ms debounce
+    600
   );
+
+  // Home button handler
+  const handleHomeClick = () => {
+    router.push('/');
+  };
 
   return (
     <motion.div
@@ -167,7 +126,22 @@ export default function ChatBottombar({
             marginTop: '-1rem',
           }}
         >
+          {/* Flex row: Home button, input, submit */}
           <div className="flex w-full items-end gap-2">
+            <button
+              type="button"
+              onClick={handleHomeClick}
+              aria-label="Go to Home"
+              className="flex items-center gap-2 rounded-full bg-[var(--muted)] px-3 py-2 text-base text-[var(--foreground)] shadow transition-colors hover:bg-white hover:text-black"
+              style={{
+                borderRadius: '9999px',
+                minWidth: 44,
+                minHeight: 36,
+                marginRight: 4,
+              }}
+            >
+              <Home className="h-5 w-5" />
+            </button>
             <input
               ref={inputRef}
               type="text"
@@ -203,40 +177,10 @@ export default function ChatBottombar({
               <ArrowUp className="h-5 w-5" />
             </button>
           </div>
-          <div className="mt-2 flex flex-wrap justify-start gap-2 pt-2">
-            {questionConfig.map(({ key, emoji }) => (
-              <button
-                key={key}
-                type="button"
-                disabled={
-                  quickQuestionDisabled || isLoading || isToolInProgress
-                }
-                onClick={() =>
-                  debouncedHandleQuickQuestion(
-                    questions[key as keyof typeof questions] || '',
-                    key
-                  )
-                }
-                className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-base font-medium text-[var(--foreground)] shadow-sm ring-1 ring-white/20 transition-all duration-150 hover:bg-white hover:text-black hover:ring-black/10 focus:outline-none active:scale-95 disabled:opacity-60"
-                aria-label={key}
-                style={{
-                  minWidth: 80,
-                  fontWeight: 500,
-                  fontSize: '0.85rem',
-                  letterSpacing: 0.1,
-                  borderRadius: '9999px',
-                  paddingLeft: 12,
-                  paddingRight: 12,
-                  paddingTop: 5,
-                  paddingBottom: 5,
-                  backdropFilter: 'blur(2px)',
-                }}
-              >
-                <span className="text-lg">{emoji}</span>
-                <span className="tracking-tight">{key}</span>
-              </button>
-            ))}
-          </div>
+          <QuickQuestionButtons
+            onClick={debouncedHandleQuickQuestion}
+            disabled={quickQuestionDisabled || isLoading || isToolInProgress}
+          />
         </div>
       </form>
     </motion.div>
