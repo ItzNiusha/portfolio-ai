@@ -47,3 +47,15 @@ jobs:
           subject-name: ghcr.io/itzniusha/portfolio-ai
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+      - name: Publish to remote server via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          port: 22
+          script: |
+            docker pull ghcr.io/itzniusha/portfolio-ai:02
+            docker stop portfolio-ai || true
+            docker rm portfolio-ai || true
+            docker run -d --name portfolio-ai -p 80:3000 ghcr.io/itzniusha/portfolio-ai:02
