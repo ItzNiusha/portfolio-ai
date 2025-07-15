@@ -8,13 +8,11 @@ import { ArrowUp } from 'lucide-react';
 import FluidCursor from '@/components/fluid-cursor';
 
 const questions = {
-  Me: "Can you tell me more about yourself? I'm curious to learn who you are.",
-  Projects:
-    'What kind of projects have you been involved in lately? What are you currently building?',
-  Skills:
-    "Could you walk me through your main strengths? I'd love to hear both your technical and interpersonal skills.",
-  Fun: "What’s the most adventurous thing you've ever done? And what do you enjoy doing for fun?",
-  Contact: 'What’s the best way to reach out to you?',
+  Me: 'Tell me about yourself.',
+  Projects: 'What projects are you working on?',
+  Skills: 'What are your key strengths?',
+  Fun: 'What’s the most adventurous thing you’ve done?',
+  Contact: 'How can I reach you?',
 } as const;
 
 const questionConfig = [

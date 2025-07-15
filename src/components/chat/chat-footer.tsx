@@ -3,16 +3,15 @@
 import { ChatRequestOptions } from 'ai';
 import { motion } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const questions = {
-  Me: "Can you tell me more about yourself? I'm curious to learn who you are.",
-  Projects:
-    'What kind of projects have you been involved in lately? What are you currently building?',
-  Skills:
-    "Could you walk me through your main strengths? I'd love to hear both your technical and interpersonal skills.",
-  Contact: 'What’s the best way to reach out to you?',
+  Me: 'Tell me about yourself.',
+  Projects: 'What projects are you working on?',
+  Skills: 'What are your key strengths?',
+  Fun: 'What’s the most adventurous thing you’ve done?',
+  Contact: 'How can I reach you?',
 } as const;
 
 const questionConfig = [
@@ -45,6 +44,30 @@ const bottomVariants = {
   },
 };
 
+function useDebouncedCallback(
+  callback: (...args: any[]) => void,
+  delay: number
+) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  function debounced(...args: any[]) {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  return debounced;
+}
+
 export default function ChatBottombar({
   input,
   handleInputChange,
@@ -56,12 +79,19 @@ export default function ChatBottombar({
 }: ChatBottombarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [quickQuestionDisabled, setQuickQuestionDisabled] = useState(false);
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, [inputRef]);
+
+  useEffect(() => {
+    if (!isLoading && !isToolInProgress) {
+      setQuickQuestionDisabled(false);
+    }
+  }, [isLoading, isToolInProgress]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (
@@ -70,21 +100,45 @@ export default function ChatBottombar({
       !isToolInProgress &&
       input.trim()
     ) {
-      e.preventDefault(); // Prevent default form submission
+      e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
 
-  const handleQuickQuestion = (question: string, key?: string) => {
-    if (key === 'Home') {
-      router.push('/');
-      return;
-    }
-    if (question) {
-      // Navigate to chat with query param, append is handled in chat.tsx useEffect
-      router.push(`/chat?query=${encodeURIComponent(question)}`);
-    }
-  };
+  // Debounced navigation to avoid rapid multiple triggers
+  const debouncedHandleQuickQuestion = useDebouncedCallback(
+    (question: string, key?: string) => {
+      // Console log for diagnostics
+      console.log('[QuickQuestion] Click detected', {
+        question,
+        key,
+        quickQuestionDisabled,
+        isLoading,
+        isToolInProgress,
+        url: `/chat?query=${encodeURIComponent(question)}`,
+      });
+
+      // Detect duplicate nav or rapid firing
+      if (quickQuestionDisabled || isLoading || isToolInProgress) {
+        console.log(
+          '[QuickQuestion] Blocked due to disabled/loading/tool in progress.'
+        );
+        return;
+      }
+      setQuickQuestionDisabled(true);
+
+      if (key === 'Home') {
+        router.push('/');
+        console.log('[QuickQuestion] Navigating Home');
+        return;
+      }
+      if (question) {
+        router.push(`/chat?query=${encodeURIComponent(question)}`);
+        console.log('[QuickQuestion] Navigating to chat with query:', question);
+      }
+    },
+    600 // 600ms debounce
+  );
 
   return (
     <motion.div
@@ -154,13 +208,16 @@ export default function ChatBottombar({
               <button
                 key={key}
                 type="button"
+                disabled={
+                  quickQuestionDisabled || isLoading || isToolInProgress
+                }
                 onClick={() =>
-                  handleQuickQuestion(
+                  debouncedHandleQuickQuestion(
                     questions[key as keyof typeof questions] || '',
                     key
                   )
                 }
-                className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-base font-medium text-[var(--foreground)] shadow-sm ring-1 ring-white/20 transition-all duration-150 hover:bg-white hover:text-black hover:ring-black/10 focus:outline-none active:scale-95"
+                className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-base font-medium text-[var(--foreground)] shadow-sm ring-1 ring-white/20 transition-all duration-150 hover:bg-white hover:text-black hover:ring-black/10 focus:outline-none active:scale-95 disabled:opacity-60"
                 aria-label={key}
                 style={{
                   minWidth: 80,

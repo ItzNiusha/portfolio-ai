@@ -180,6 +180,7 @@ const Chat = () => {
                   </motion.div>
                 ) : null
               )}
+              {/* Removed Loading... for AI answers */}
             </>
           )}
         </AnimatePresence>
