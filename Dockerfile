@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS deps
 
 WORKDIR /app
 
@@ -8,18 +8,18 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build 
+RUN npm run build
 
-FROM nginx:alpine
+FROM node:20-alpine AS runner
+WORKDIR /app
 
+ENV NODE_ENV=production
 
-RUN rm -rf /usr/share/nginx/html/*
+COPY --from=deps /app/public ./public
+COPY --from=deps /app/.next ./.next
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
 
+EXPOSE 3000
 
-COPY --from=builder /app/out /usr/share/nginx/html
-
-
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
