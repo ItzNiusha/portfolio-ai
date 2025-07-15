@@ -93,11 +93,11 @@ const PROJECT_CONTENT = [
     ],
     images: [
       {
-        src: '/quiz1.jpeg',
+        src: '/quiz1.JPEG',
         alt: 'Quiz main page',
       },
       {
-        src: '/quiz2.jpeg',
+        src: '/quiz2.JPEG',
         alt: 'Quiz game',
       },
     ],
