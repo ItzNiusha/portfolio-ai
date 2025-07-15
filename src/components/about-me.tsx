@@ -12,7 +12,7 @@ const profile = {
   location: 'Stockholm, Sweden',
   src: '/profile-niush.PNG',
   tags: ['Developer', 'Tech Girl', 'Stockholm', 'Challenge', 'Coding'],
-  resume: '/niushasresume.pdf',
+  resume: '/NessasResume.pdf',
 };
 
 
