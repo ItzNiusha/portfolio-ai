@@ -42,15 +42,11 @@ itzniusha@gmail.com
 Full-stack development with JavaScript, TypeScript, React, Blazor, C#, .NET, Java. Experienced with SQL, PostgreSQL, GCP, Docker, GitHub Actions, and REST API design. Focused on clean architecture, maintainable code, and solid testing practices.
 
 ### Experience
-- **Junior Software Engineer at Sage (Remote, 2024–25):**  
-  - Built and maintained e-commerce systems using React.js (frontend) and Blazor/.NET (backend)  
-  - Managed PostgreSQL databases and containerized apps using Docker  
-  - Implemented CI/CD pipelines with GitHub Actions and deployed on Google Cloud  
-
 - **Freelance Full-Stack Developer (2025–present):**  
-  - Developed a 3D sunglasses product catalog using Three.js and Blazor  
-  - Created a dynamic portfolio website with .NET Core and SQL Server  
-  - Implemented content filtering and user-focused navigation systems  
+  -Developed and deployed full-stack applications, including a 3D designer portfolio and an
+  online sunglasses store.
+  -Utilized FastAPI and ReactJS for backend and frontend development, respectively.
+  -Integrated PostgreSQL databases
 
 ### Projects
 - **Quiz Planet:** Mobile quiz app (Java/Kotlin, Firebase) with CI/CD pipelines  

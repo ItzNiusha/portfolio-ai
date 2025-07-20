@@ -14,7 +14,7 @@ export function Resume() {
     lastUpdated: 'Jul 2025',
     fileSize: '0.2 MB',
     previewImageSrc: '',
-    downloadUrl: '/ResumeNessa.pdf',
+    downloadUrl: '/ResumeNessa01.pdf',
   };
 
   const handleDownload = () => {
