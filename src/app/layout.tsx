@@ -42,8 +42,8 @@ export const metadata: Metadata = {
     creator: '@itzniusha',
   },
   icons: {
-    icon: [{ url: '/favicon.png', sizes: 'any' }],
-    shortcut: '/favicon.png?v=2',
+    icon: [{ url: '/favicon.PNG', sizes: 'any' }],
+    shortcut: '/favicon.PNG?v=2',
   },
 };
 
